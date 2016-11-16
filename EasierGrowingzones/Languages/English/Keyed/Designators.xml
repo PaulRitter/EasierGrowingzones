@@ -1,7 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <LanguageData>
 
-	<RichsoilOnlyZone>Growing zone (Rich soil only)</RichsoilOnlyZone>
-	<DesignatorRichsoilOnlyZoneDesc>Create a zone where your colonists will try to grow a certain kind of plant. This tool will only designate rich soil</DesignatorRichsoilOnlyZoneDesc>
+	<CostumSoilOnlyZone>Growing zone ({0} only)</CostumSoilOnlyZone>
+	<DesignatorCostumSoilZoneDesc>Create a zone where your colonists will try to grow a certain kind of plant. This tool will only designate {0}, but you can also select other Floors tp grow it on.</DesignatorCostumSoilZoneDesc>
+	<ERR_No_TerrainDefs>No TerrainDefs with fertility >= 0.4 present. This shouldn't happen.</ERR_No_TerrainDefs>
 
 </LanguageData>
