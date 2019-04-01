@@ -61,7 +61,7 @@ namespace RimWorld
                          select x;
             foreach (TerrainDef current in enumerable)
             {
-                string labelCap = current.label.CapitalizeFirst(); ;
+                string labelCap = current.label.CapitalizeFirst();
                 list.Add(new FloatMenuOption(labelCap, delegate
                 {
                     this.ProcessInput(ev);
