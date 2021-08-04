@@ -55,11 +55,7 @@
     </Reference>
     
   </ItemGroup>
-  
-  <ItemGroup>
-    <Compile Include="EasierGrowingZones.cs" />
-  </ItemGroup>
-  
+ 
   <ItemGroup>
     <None Remove=".editorconfig" />
     <None Remove="mono_crash.*.json" />
@@ -68,5 +64,5 @@
   <Target Name="Publicise" BeforeTargets="BeforeBuild">
     <Publicise AssemblyPath="..\..\..\RimWorldWin64_Data\Managed\Assembly-CSharp.dll" OutputPath="..\..\..\RimWorldWin64_Data\Managed\" />
   </Target>
-    
+  
 </Project>

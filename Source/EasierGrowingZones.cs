@@ -1,45 +1,50 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
+using RimWorld;
 using Verse;
+using UnityEngine;
+using HarmonyLib;
+using System.Reflection;
 
-namespace RimWorld
+namespace EasierGrowingZones
 {
-    public class Designator_ZoneAdd_CostumSoilOnly : Designator_ZoneAdd
+    [StaticConstructorOnStartup]
+    public static class TerrainZoneSelectLoader
     {
-        private TerrainDef curDef = TerrainDefOf.Soil;
-
-        protected override string NewZoneLabel
+        static TerrainZoneSelectLoader()
         {
-            get
-            {
-                return "CostumSoilOnlyZone".Translate(curDef.label.CapitalizeFirst());
-            }
+            var harmony = new Harmony("net.mseal.rimworld.mod.terrainzoneselect");
+            harmony.PatchAll(Assembly.GetExecutingAssembly());
         }
+    }
 
-        public Designator_ZoneAdd_CostumSoilOnly()
+    public class Designator_EasierGrowingZoneSelect : Designator_ZoneAdd_Growing
+    {
+        public Designator_EasierGrowingZoneSelect()
         {
             this.zoneTypeToPlace = typeof(Zone_Growing);
-            this.defaultLabel = "CostumSoilOnlyZone".Translate(curDef.label.CapitalizeFirst());
-            this.defaultDesc = "DesignatorCostumSoilZoneDesc".Translate(curDef.label.CapitalizeFirst());
+            this.defaultLabel = "EasierGrowingZone".Translate(curDef.label.CapitalizeFirst());
+            this.defaultDesc = "DesignatorEasierGrowingZoneDesc".Translate(curDef.label.CapitalizeFirst());
             this.icon = ContentFinder<Texture2D>.Get("UI/Designators/ZoneCreate_Growing", true);
-            this.tutorTag = "";
         }
 
-        public override AcceptanceReport CanDesignateCell(IntVec3 c)
+        private TerrainDef curDef = TerrainDefOf.Soil;
+
+        public override AcceptanceReport CanDesignateCell(IntVec3 c, Map map)
         {
             if (!base.CanDesignateCell(c).Accepted)
             {
                 return false;
             }
-            if (Find.TerrainGrid.TerrainAt(c) != curDef)
+            if (map.terrainGrid.TerrainAt(c) != curDef)
             {
                 return false;
             }
             return true;
         }
 
-        protected override Zone MakeNewZone()
+        public override Zone MakeNewZone()
         {
             PlayerKnowledgeDatabase.KnowledgeDemonstrated(ConceptDefOf.GrowingFood, KnowledgeAmount.Total);
             return new Zone_Growing();
@@ -64,10 +69,10 @@ namespace RimWorld
                 string labelCap = current.label.CapitalizeFirst();
                 list.Add(new FloatMenuOption(labelCap, delegate
                 {
-                    this.ProcessInput(ev);
+                    ProcessInput(ev);
                     DesignatorManager.Select(this);
-                    this.curDef = TerrainDef.Named(current.defName);
-                }, MenuOptionPriority.Medium, null, null, 0f, null)
+                    curDef = TerrainDef.Named(current.defName);
+                }, MenuOptionPriority.Low, null, null, 0f, null)
                 {
                     tutorTag = "SelectStuff-" + current.defName
                 });
@@ -83,6 +88,21 @@ namespace RimWorld
                 Find.WindowStack.Add(floatMenu);
                 DesignatorManager.Select(this);
             }
+        }
+    }
+
+    [HarmonyPatch(typeof(Zone_Growing), "GetZoneAddGizmos")]
+    class ZoneGrowPatch
+    {
+        public static IEnumerable<Gizmo> GetZoneAddGizmos()
+        {
+            yield return DesignatorUtility.FindAllowedDesignator<Designator_EasierGrowingZoneSelect>();
+        }
+
+        static bool Prefix(ref IEnumerable<Gizmo> __result)
+        {
+            __result = GetZoneAddGizmos();
+            return false;
         }
     }
 }
